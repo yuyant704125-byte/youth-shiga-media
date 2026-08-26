@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YOUTH SHIGA / 認可コード</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --paper:#f7f6f2; --card:#fff; --sunk:#eeece4;
+  --ink:#16211c; --ink-2:#4a5750; --ink-3:#7d8a82;
+  --line:#dfdcd1; --green:#2c5341; --amber:#a87513; --vermil:#9e3524;
+  --mono:"JetBrains Mono","Noto Sans JP",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#121815; --card:#1a221e; --sunk:#0d120f;
+    --ink:#e8ebe7; --ink-2:#a3aea8; --ink-3:#79847e;
+    --line:#2b3531; --green:#7fb99a; --amber:#e0b45f; --vermil:#e08a76;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Noto Sans JP",system-ui,sans-serif;
+  line-height:1.8; padding:40px 20px;
+  display:flex; justify-content:center;
+}
+.box{width:100%;max-width:620px;}
+.kick{
+  font-family:var(--mono); font-size:11px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--green); font-weight:700;
+}
+h1{
+  font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900;
+  font-size:28px; line-height:1.3; margin:10px 0 18px;
+}
+.panel{
+  background:var(--card); border:1px solid var(--line);
+  padding:24px; margin-bottom:18px;
+}
+.lab{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:700;
+  margin-bottom:10px;
+}
+#code{
+  font-family:var(--mono); font-size:15px; font-weight:700;
+  word-break:break-all; background:var(--sunk);
+  border:1px solid var(--line); padding:14px; line-height:1.6;
+  color:var(--ink);
+}
+button{
+  font-family:inherit; font-size:15px; font-weight:700;
+  background:var(--green); color:var(--paper);
+  border:none; padding:13px 22px; margin-top:14px;
+  cursor:pointer; width:100%;
+}
+button:hover{opacity:.88;}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+button.ok{background:var(--amber);}
+.note{
+  border-left:3px solid var(--amber); background:var(--card);
+  padding:14px 18px; font-size:14px; color:var(--ink-2);
+}
+.note b{color:var(--ink);}
+.err{border-left-color:var(--vermil);}
+.err b{color:var(--vermil);}
+.steps{font-size:14px;color:var(--ink-2);padding-left:20px;margin-top:8px;}
+.steps li{margin:6px 0;}
+.foot{
+  margin-top:26px; font-size:12px; color:var(--ink-3);
+  border-top:1px solid var(--line); padding-top:14px;
+}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="kick">YOUTH SHIGA / Instagram</div>
+  <h1 id="head">認可コード</h1>
+  <div id="out"></div>
+  <div class="foot">
+    このページは Instagram の認可コードを受け取るためだけのものです。<br>
+    コードはこの画面に表示されるだけで、どこにも送信されません。
+  </div>
+</div>
+
+<script>
+(function(){
+  var out = document.getElementById("out");
+  var head = document.getElementById("head");
+  var params = new URLSearchParams(location.search);
+  var code = params.get("code");
+  var err = params.get("error_description") || params.get("error");
+
+  if (code) {
+    code = code.replace(/#_$/, "");
+    head.textContent = "コードを受け取りました";
+    var p = document.createElement("div");
+    p.className = "panel";
+    p.innerHTML = '<div class="lab">認可コード</div><div id="code"></div>';
+    out.appendChild(p);
+    document.getElementById("code").textContent = code;
+
+    var btn = document.createElement("button");
+    btn.textContent = "コードをコピー";
+    btn.onclick = function(){
+      navigator.clipboard.writeText(code).then(function(){
+        btn.textContent = "コピーしました";
+        btn.className = "ok";
+      }).catch(function(){
+        btn.textContent = "コピーできませんでした。上の文字を選択してください";
+      });
+    };
+    p.appendChild(btn);
+
+    var n = document.createElement("div");
+    n.className = "note";
+    n.innerHTML = '<b>このまま PowerShell に戻ってください。</b>' +
+      '<ol class="steps"><li>「URLを貼り付け」と聞かれている画面に戻る</li>' +
+      '<li>コピーしたコードをそのまま貼り付ける</li></ol>' +
+      'このコードは <b>1時間で失効し、1回しか使えません</b>。すぐに続けてください。';
+    out.appendChild(n);
+
+  } else if (err) {
+    head.textContent = "許可されませんでした";
+    var e = document.createElement("div");
+    e.className = "note err";
+    e.innerHTML = '<b>エラー:</b> ' + err +
+      '<br><br>もう一度スクリプトを実行し、表示されたURLを開いて「許可する」を押してください。';
+    out.appendChild(e);
+
+  } else {
+    head.textContent = "待機中";
+    var w = document.createElement("div");
+    w.className = "note";
+    w.innerHTML = 'このページは、Instagram の認可画面で<b>「許可する」</b>を押したあとに開かれます。' +
+      '<br><br>いま直接開いた場合は、まず PowerShell で <b>setup_token.py</b> を実行してください。';
+    out.appendChild(w);
+  }
+})();
+</script>
+</body>
+</html>
